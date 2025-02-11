@@ -1,10 +1,33 @@
 #ifndef DEFS_H
 #define DEFS_H
 
+#include "stdlib.h"
+#include "stdio.h"
+
+// #define DEBUG
+
+#define DEBUG
+
+#ifndef DEBUG
+#define ASSERT(n)
+#else
+#define ASSERT(n) \
+if(!(n)) { \
+    printf("%s - Failed", #n); \
+    printf("On %s ", __DATE__); \
+    printf("At %s ", __TIME__); \
+    printf("In File %s ", __FILE__); \
+    printf("At Line %d\n", __LINE__); \
+    exit(1); \
+}
+#endif
+
+  
 typedef unsigned long long U64;
 
 #define NAME "suboChess 1.0"
 #define BRD_SQ_NUM 120
+#define MAXGAMEMOVES 6000
 
 // Piece enumeration
 enum { EMPTY, wP, wN, wR, wQ, wK, bP, bN, bR, bQ, bK };
@@ -32,6 +55,16 @@ enum {
 
 // Boolean values
 enum { FALSE, TRUE };
+enum {WKCA = 1, WQCA = 2, BKCA = 4, BQCA = 8} ;
+
+typedef struct {
+    int move;
+    int castlePerm;
+    int enPas;
+    int fiftyMove;
+    U64 posKey;
+}S_UNDO;
+
 
 // Board structure
 typedef struct {
@@ -45,6 +78,7 @@ typedef struct {
 
     int ply;                // Half-move counter for search depth
     int hisPly;             // Total half-move counter in the game
+    int castlePerm;
 
     U64 posKey;             // Unique position key (Zobrist hashing)
 
@@ -52,6 +86,27 @@ typedef struct {
     int bigPce[3];          // Count of non-pawn pieces for WHITE, BLACK, and BOTH
     int majPce[3];          // Count of major pieces (rooks and queens) for WHITE, BLACK, and BOTH
     int minPce[3];          // Count of minor pieces (knights and bishops) for WHITE, BLACK, and BOTH
-} Board;
+
+    S_UNDO history[MAXGAMEMOVES];
+    // piece list
+    int pList[13][10];
+    //   
+
+} S_BOARD;
+
+// macros
+#define FR2SQ(f,r)((21+(f))+((r)*10))
+#define SQ64(sq120) Sq120toSq64[sq120]
+// globals
+
+extern int Sq120toSq64[BRD_SQ_NUM];
+extern int Sq64toSq120[64]; 
+
+// functions
+extern void AllInit(); 
+extern void PrintBitBoard(U64 bb);
+
+//init.c
+
 
 #endif

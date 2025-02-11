@@ -1,5 +1,5 @@
 all:
-	gcc suboChess.c -o suboChess
+	gcc suboChess.c init.c bitboards.c -o suboChess
 
 clean:
 	del /f /q suboChess.exe
